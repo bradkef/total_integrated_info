@@ -1,5 +1,9 @@
 # total_integrated_info
-Function to compute total integrated information over all partitions of small systems.
+This package computes total effective information of all possible partitions of a system.
+
+To reproduce the code execute following: 
+1. pip install -r "requirements.txt"
+2. python3 total_integrated_info.py 
 
 A system is a network which has nodes that can attain values 0 or 1 and which have update rules according to which these states change over time. The states of a system together at a given time t are a configuration.
 
@@ -133,11 +137,7 @@ Calculates the probabilities of configurations in the network `G` after one upda
 
 Further, `network-examples`, different small examples of networks, such as random networks, cycles, fully connected networks and types of wedges of cycles are provided, which can be used for initialization.
 
-To reproduce the code execute following: 
-1. pip install -r "requirements.txt"
-2. python3 total_integrated_info.py 
-
 
 ## Acknowledgements
 
-A big thanks to Marc for his valuable ideas on representing systems! https://github.com/marcsinner
+A big thanks to Marc for his valuable ideas on representing systems in python! https://github.com/marcsinner
