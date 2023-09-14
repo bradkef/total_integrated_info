@@ -16,34 +16,34 @@ def initialise_node_attributes(G):
         G.nodes[node]['update_rule'] = and_update
     return
 
-def and_update(neighbor_states,state):
+def and_update(neighbor_states,state): # standard update rule for neurons
     if neighbor_states == []:
         return 0
     if all(neighbor_state == 1 for neighbor_state in neighbor_states):
         return 1 
     return 0
 
-def keep_state_update(neighbor_states,state):
+def keep_state_update(neighbor_states,state): # virtual neuron's update rule
     return state
 
-def update_inc_states(G):
+def update_inc_states(G): # updates the incoming states of all nodes
     for node in G.nodes():
         G.nodes[node]['neighbor_states'] = []
         for pred in G.nodes[node]['predecessors']:
             G.nodes[node]['neighbor_states'].append(G.nodes[pred]['state']) 
     return
 
-def update_states(G):
+def update_states(G): # updates the states of all nodes depending on their incoming states
     for node in G.nodes():
         G.nodes[node]['state'] = G.nodes[node]['update_rule'](G.nodes[node]['neighbor_states'],G.nodes[node]['state'])
     return
 
-def update(G):
+def update(G): # one update step of the system
     update_inc_states(G)
     update_states(G)
     return
 
-def init_config(G,config):
+def init_config(G,config): # initialises the system with a given configuration config
     if len(config) != len(G.nodes()):
         print('Error: Config length unequal number of nodes')
         return
@@ -53,13 +53,13 @@ def init_config(G,config):
         k+=1
     return
 
-def curr_config(G):
+def curr_config(G): # returns current system configuration
     config=[]
     for node in G.nodes():
         config.append(G.nodes[node]['state'])
     return tuple(config)
 
-def get_virtual_nodes(G):
+def get_virtual_nodes(G): # returns all virtual nodes of the system
     virtual_nodes=[]
     for node in G.nodes():
         if G.nodes[node]['virtual']:
@@ -76,8 +76,8 @@ def check_virtual_node(subgraph,part,node): # check if virtual node has to be ad
                 outliers.append(pred)
     return outliers
 
-def add_virtual_node(subgraph,outliers,node):
-    k = max(99, max(subgraph.nodes())) + 1
+def add_virtual_node(subgraph,outliers,node): # adds a virtual node and properly initialises it
+    k = max(99, max(subgraph.nodes())) + 1 # virtual nodes are numbered from 100 on
     subgraph.add_edge(k,node)
     
     # update predecessors of node to not contain outliers except for one
@@ -92,13 +92,13 @@ def add_virtual_node(subgraph,outliers,node):
     subgraph.nodes[k]['update_rule'] = keep_state_update
     return
 
-def partitioned_subgraphs(G,partition):
+def partitioned_subgraphs(G,partition): # partitions a system according to a parition by calling the partition function for each part
     subgraphs=[]
     for part in partition:
         subgraphs.append(partitioned_subgraph(G,part))
     return subgraphs
 
-def partitioned_subgraph(G,part):
+def partitioned_subgraph(G,part): # adds virtual nodes according to the definitions of a subsystem
     temp_subgraph = G.subgraph(part)
     subgraph = temp_subgraph.copy()
     for node in temp_subgraph.nodes():
@@ -109,7 +109,7 @@ def partitioned_subgraph(G,part):
 ### --------------------------------------------------------------
 
 ### ----------calculate-EI/P--------------------------------------
-def EI(G):
+def EI(G): # calculates total effective information for all partitions
     total_distr = target_distr(G)
     effective_info = {}
     for partition in partitions(G.number_of_nodes()):
@@ -118,7 +118,7 @@ def EI(G):
         effective_info[tuple(tuple(part) for part in partition)] = calc_EI_P(total_distr, parts_distr) 
     return effective_info
 
-def EI_P(G,partition): # calculate the distributions of configurations of the parts in the partition
+def EI_P(G,partition): # calculates the distributions of configurations of the parts in the partition
     parts_distr=[]
     subgraphs = partitioned_subgraphs(G,partition)
     for subgraph in subgraphs:
@@ -134,7 +134,7 @@ def calc_EI_P(total_distr, parts_distr): # calculates KL-divergence of the c(f()
     parts_distr = prob_conversion(parts_distr)
     return KLdiv(total_distr, parts_distr)
 
-def collective_distribution(parts_distr):
+def collective_distribution(parts_distr): # this is function c. it concatenates all the subconfigurations in the correct order
     partition=parts_distr.pop(0)
     length=0 # gives length of total configuration
     for d in parts_distr:
@@ -186,7 +186,7 @@ def prob_conversion(amount_dict):  # turn dict with amounts into probabilities
         amount_dict[x] = amount_dict[x]/total
     return amount_dict
 
-def KLdiv(P,Q):
+def KLdiv(P,Q): # calculates KL-divergence of two probability distributions
     KL = 0
     for omega in P:
         if P[omega] == 0:
@@ -217,7 +217,7 @@ def target_distr(G): # calculate probabilities of configurations in G after one 
 ### --------------------------------------------------------------
 
 ### ----------genereate-all-partitions----------------------------
-def partition_recursion(n, k, partitions):
+def partition_recursion(n, k, partitions): # recursively generates all possible partitions
     if k == n:
         return partitions
     new_partitions = []
@@ -236,7 +236,7 @@ def partitions(n): # return all covers of a list of integers 0,...,n-1
 ### --------------------------------------------------------------
 
 ### ----------all-possible-configs--------------------------------
-def generate_all_configs(n, word=tuple()):
+def generate_all_configs(n, word=tuple()): # generates all possible configurations of a system recursively
     if n == 0:
         return [word]
     return generate_all_configs(n - 1, word + (0,)) + generate_all_configs(n - 1, word + (1,))
