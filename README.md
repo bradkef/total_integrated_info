@@ -1,6 +1,8 @@
 # total_integrated_info
 This package computes total effective information of all possible partitions of a system.
 
+Note: We also added the package equivalent_graphs, which provides functions that allow to determine equivalence classes of graphs. Using these can reduce runtime significantly depending on the application.
+
 To reproduce the code execute following: 
 1. pip install -r "requirements.txt"
 2. python3 total_integrated_info.py 
